@@ -36,7 +36,7 @@ func TestRawToJson(t *testing.T) {
 				Sku:            "NIKE-BLCK-42-M-1",
 				Name:           "stan smith sneaker",
 				ImageUrl:       "Stan_Smith_Lux_Shoes_Black_IH2450_01_standard.avif",
-				DepartmentRaw:  []uint8([]byte(depJson)),
+				DepartmentRaw:  []byte(depJson), // []byte is an alias of []uint8
 				DepartmentJson: Deps{Department: []string{}},
 			},
 			err: nil,
