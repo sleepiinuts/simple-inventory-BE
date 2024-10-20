@@ -30,20 +30,21 @@ var (
 func (p *Product) RawToJson(fieldName string) error {
 	// check if xxRaw exist
 	rawName := fieldName + "Raw"
-	_, exist := reflect.TypeOf(*p).FieldByName(rawName)
+	_, exist := reflect.TypeOf(p).Elem().FieldByName(rawName)
 	if !exist {
 		return fmt.Errorf("%w[%s]", ErrFieldNotFound, rawName)
 	}
 
 	// check if xxJson exist
 	jsonName := fieldName + "Json"
-	_, exist = reflect.TypeOf(*p).FieldByName(jsonName)
+	_, exist = reflect.TypeOf(p).Elem().FieldByName(jsonName)
 	if !exist {
 		return fmt.Errorf("%w[%s]", ErrFieldNotFound, jsonName)
 	}
 
 	// get raw/json valued fields
-	rawField := reflect.ValueOf(*p).FieldByName(rawName)
+	rawField := reflect.ValueOf(p).Elem().FieldByName(rawName)
+	jsonField := reflect.ValueOf(p).Elem().FieldByName(jsonName)
 
 	// check if xxRaw is zerod value
 	if rawField.IsZero() {
@@ -53,14 +54,7 @@ func (p *Product) RawToJson(fieldName string) error {
 	// extract "underlying" value from rawField Value
 	buf := rawField.Interface().([]uint8)
 
-	var err error
-	switch fieldName {
-	case "Department":
-		err = json.Unmarshal(buf, &p.DepartmentJson)
-	default:
-		err = fmt.Errorf("%w[Missing unmarshal case for field %s],", ErrUnmarshal, fieldName)
-	}
-
+	err := json.Unmarshal(buf, jsonField.Addr().Interface())
 	if err != nil {
 		return fmt.Errorf("%w[%s->%s]: %w", ErrUnmarshal, rawName, jsonName, err)
 	}
