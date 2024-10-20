@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 )
@@ -27,19 +28,23 @@ var (
 	ErrUnmarshal     = fmt.Errorf("marshalling of raw to json has error")
 )
 
-func (p *Product) RawToJson(fieldName string) error {
+func (p *Product) RawToJson(fieldName string) (err error) {
 	// check if xxRaw exist
 	rawName := fieldName + "Raw"
 	_, exist := reflect.TypeOf(p).Elem().FieldByName(rawName)
 	if !exist {
-		return fmt.Errorf("%w[%s]", ErrFieldNotFound, rawName)
+		err = fmt.Errorf("%w[%s]", ErrFieldNotFound, rawName)
 	}
 
 	// check if xxJson exist
 	jsonName := fieldName + "Json"
 	_, exist = reflect.TypeOf(p).Elem().FieldByName(jsonName)
 	if !exist {
-		return fmt.Errorf("%w[%s]", ErrFieldNotFound, jsonName)
+		err = errors.Join(err, fmt.Errorf("%w[%s]", ErrFieldNotFound, jsonName))
+	}
+
+	if err != nil {
+		return err
 	}
 
 	// get raw/json valued fields
@@ -54,10 +59,10 @@ func (p *Product) RawToJson(fieldName string) error {
 	// extract "underlying" value from rawField Value
 	buf := rawField.Interface().([]uint8)
 
-	err := json.Unmarshal(buf, jsonField.Addr().Interface())
+	err = json.Unmarshal(buf, jsonField.Addr().Interface())
 	if err != nil {
 		return fmt.Errorf("%w[%s->%s]: %w", ErrUnmarshal, rawName, jsonName, err)
 	}
 
-	return nil
+	return err
 }
