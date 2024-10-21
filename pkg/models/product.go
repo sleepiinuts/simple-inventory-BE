@@ -12,9 +12,9 @@ type Product struct {
 	Id             int     `db:"ID" json:"id"`
 	Sku            string  `db:"SKU" json:"sku"`
 	Name           string  `db:"NAME" json:"name"`
-	ImageUrl       string  `db:"IMAGE_URL" json:"image_url"`
-	DepartmentRaw  []uint8 `db:"DEP" json:"dep"`
-	DepartmentJson Deps
+	ImageUrl       string  `db:"IMAGE_URL" json:"imageUrl"`
+	DepartmentRaw  []uint8 `db:"DEP" json:"-"`
+	DepartmentJson Deps    `json:"departmentJson"`
 	Price          float32 `db:"PRICE" json:"price"`
 }
 

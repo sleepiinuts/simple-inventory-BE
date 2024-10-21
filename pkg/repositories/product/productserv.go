@@ -26,6 +26,12 @@ func (p *ProductServ) GetAll() ([]models.Product, error) {
 			return nil, fmt.Errorf("product-serv-getAll [scan]: %w", err)
 		}
 
+		// call RawToJson: Department
+		err = product.RawToJson("Department")
+		if err != nil {
+			return nil, fmt.Errorf("product-serv-getAll [rawToJson]: %w", err)
+		}
+
 		products = append(products, product)
 	}
 	return products, nil
