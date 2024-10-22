@@ -74,7 +74,13 @@ func (p *ProductServ) GetAllWithPaging(pageIndex, pageSize int) (PagingProduct, 
 
 		err = rows.StructScan(&product)
 		if err != nil {
-			return pp, fmt.Errorf("product-serv-getAllWithPaging [rawToJson]: %w", err)
+			return pp, fmt.Errorf("product-serv-getAllWithPaging [scan]: %w", err)
+		}
+
+		// call RawToJson: Department
+		err = product.RawToJson("Department")
+		if err != nil {
+			return pp, fmt.Errorf("product-serv-getAll [rawToJson]: %w", err)
 		}
 
 		pp.Products = append(pp.Products, product)
